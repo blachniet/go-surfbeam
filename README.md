@@ -1,4 +1,4 @@
-# SurfBeam
+# go-surfbeam
 
 This package provides easy access modem status data provided by ViaSat's
 SurfBeam® 2 satellite modems' CGI api.
