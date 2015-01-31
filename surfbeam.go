@@ -3,6 +3,7 @@ package surfbeam
 import (
 	"fmt"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"strconv"
 	"strings"
@@ -59,8 +60,12 @@ func (c *Client) triaStatusURI() string {
 func parseModemStatus(str string) (*ModemStatus, error) {
 	parts := strings.Split(str, "##")
 	var status ModemStatus
-	status.IPAddress = parts[0]
-	status.MACAddress = parts[1]
+	status.IPAddress = net.ParseIP(parts[0])
+	if mac, err := net.ParseMAC(parts[1]); err != nil {
+		return nil, err
+	} else {
+		status.MACAddress = mac
+	}
 	status.SoftwareVersion = parts[2]
 	status.HardwareVersion = parts[3]
 	status.Status = parts[4]
@@ -166,8 +171,8 @@ func parsePercentage(str string, dest *float64) error {
 
 // ModemStatus provides information describing the state of the modem.
 type ModemStatus struct {
-	IPAddress                  string
-	MACAddress                 string
+	IPAddress                  net.IP
+	MACAddress                 net.HardwareAddr
 	SoftwareVersion            string
 	HardwareVersion            string
 	Status                     string

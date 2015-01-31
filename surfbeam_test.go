@@ -1,6 +1,8 @@
 package surfbeam
 
 import (
+	"bytes"
+	"net"
 	"testing"
 )
 
@@ -83,8 +85,8 @@ func TestParsePercentage(t *testing.T) {
 
 var modemStatusTests = []struct {
 	in                 string
-	IPAddress          string
-	MACAddress         string
+	IPAddress          net.IP
+	MACAddress         net.HardwareAddr
 	SoftwareVersion    string
 	HardwareVersion    string
 	Status             string
@@ -95,8 +97,8 @@ var modemStatusTests = []struct {
 }{
 	{
 		`55.55.55.55##55:55:55:55:55:55##UT_1.5.2.2.3##UT_7 P3_V1##Online##7,088,473##1,693,689,905##9,378,757##9,532,929,796##000:01:37:54##2##6.2##32%##012345678901##-44.3##47%##1.5##6%##Active##12.4##82%##Single##0123456789##images/Modem_Status_005_Online.png##/images/Satellite_Status_Purple.png##0##<p style=""color:green"">Connected</p>##<p style=""color:green"">Good</p>##0.00%##0.00%##6.67s##195##10000000##`,
-		"55.55.55.55",
-		"55:55:55:55:55:55",
+		net.IPv4(0x37, 0x37, 0x37, 0x37),
+		[]byte{0x37, 0x37, 0x37, 0x37, 0x37, 0x37},
 		"UT_1.5.2.2.3",
 		"UT_7 P3_V1",
 		"Online",
@@ -112,8 +114,8 @@ func TestParseModemStatus(t *testing.T) {
 		if status, err := parseModemStatus(tt.in); err != nil {
 			t.Errorf("ParseModemStatus error: %v (in: %q)", err, tt.in)
 		} else {
-			assertEqual(t, tt.IPAddress, status.IPAddress, "IPAddress")
-			assertEqual(t, tt.MACAddress, status.MACAddress, "MACAddress")
+			assertIPEqual(t, tt.IPAddress, status.IPAddress, "IPAddress")
+			assertMACEqual(t, tt.MACAddress, status.MACAddress, "MACAddress")
 			assertEqual(t, tt.SoftwareVersion, status.SoftwareVersion, "SoftwareVersion")
 			assertEqual(t, tt.HardwareVersion, status.HardwareVersion, "HardwareVersion")
 			assertEqual(t, tt.Status, status.Status, "Status")
@@ -128,5 +130,17 @@ func TestParseModemStatus(t *testing.T) {
 func assertEqual(t *testing.T, expected interface{}, actual interface{}, name string) {
 	if expected != actual {
 		t.Errorf("Expected %v %v but was %v", name, expected, actual)
+	}
+}
+
+func assertIPEqual(t *testing.T, expected net.IP, actual net.IP, name string) {
+	if !expected.Equal(actual) {
+		t.Errorf("Expected %v to be %v but was %v", name, expected, actual)
+	}
+}
+
+func assertMACEqual(t *testing.T, expected, actual net.HardwareAddr, name string) {
+	if bytes.Equal(expected, actual) {
+		t.Errorf("Expected %v to be %v but was %v", name, expected, actual)
 	}
 }
