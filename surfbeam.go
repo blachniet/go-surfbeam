@@ -56,86 +56,112 @@ func (c *Client) triaStatusURI() string {
 	return c.modemURI + triaStatusPath
 }
 
-func parseModemStatus(str string) (*ModemStatus, error){
-  parts := strings.Split(str, "##")
-  var status ModemStatus
-  status.IPAddress = parts[0]
-  status.MACAddress = parts[1]
-  status.SoftwareVersion = parts[2]
-  status.HardwareVersion = parts[3]
-  status.Status = parts[4]
-  if err := parseInt64(parts[5], &status.TransmittedPackets); err != nil { return nil, err }
-  if err := parseInt64(parts[6], &status.TransmittedBytes); err != nil { return nil, err }
-  if err := parseInt64(parts[7], &status.ReceivedPackets); err != nil { return nil, err }
-  if err := parseInt64(parts[8], &status.ReceivedBytes); err != nil { return nil, err }
-  status.OnlineTime = parts[9]
-  if err := parseInt64(parts[10], &status.LossOfSyncCount); err != nil{ return nil, err}
-  if err := parseFloat64(parts[11], &status.RxSNR); err != nil { return nil, err}
-  if err := parsePercentage(parts[12], &status.RxSNRPercentage); err != nil { return nil, err}
-  status.SerialNumber = parts[13]
-  if err := parseFloat64(parts[14], &status.RxPower); err != nil { return nil, err}
-  if err := parsePercentage(parts[15], &status.RxPowerPercentage); err != nil { return nil, err}
-  if err := parseFloat64(parts[16], &status.CableResistance); err != nil { return nil, err}
-  if err := parsePercentage(parts[17], &status.CableResistancePercentage); err != nil { return nil, err}
-  status.ODUTelemetryStatus = parts[18]
-  if err := parseFloat64(parts[19], &status.CableAttenuation); err != nil { return nil, err}
-  if err := parsePercentage(parts[20], &status.CableAttenuationPercentage); err != nil { return nil, err}
-  status.IFLType = parts[21]
-  status.PartNumber = parts[22]
-  status.StatusImageURI = parts[23]
-  status.SatelliteStatusURI = parts[24]
-  status.Unknown25 = parts[25]
-  status.StatusHTML = parts[26]
-  status.HealthHTML = parts[27]
-  status.Unknown28 = parts[28]
-  status.Unknown29 = parts[29]
-  status.LastPageLoadDuration = parts[30]
-  status.Unknown31 = parts[31]
-  status.Unknown32 = parts[32]
-  return &status, nil
+func parseModemStatus(str string) (*ModemStatus, error) {
+	parts := strings.Split(str, "##")
+	var status ModemStatus
+	status.IPAddress = parts[0]
+	status.MACAddress = parts[1]
+	status.SoftwareVersion = parts[2]
+	status.HardwareVersion = parts[3]
+	status.Status = parts[4]
+	if err := parseInt64(parts[5], &status.TransmittedPackets); err != nil {
+		return nil, err
+	}
+	if err := parseInt64(parts[6], &status.TransmittedBytes); err != nil {
+		return nil, err
+	}
+	if err := parseInt64(parts[7], &status.ReceivedPackets); err != nil {
+		return nil, err
+	}
+	if err := parseInt64(parts[8], &status.ReceivedBytes); err != nil {
+		return nil, err
+	}
+	status.OnlineTime = parts[9]
+	if err := parseInt64(parts[10], &status.LossOfSyncCount); err != nil {
+		return nil, err
+	}
+	if err := parseFloat64(parts[11], &status.RxSNR); err != nil {
+		return nil, err
+	}
+	if err := parsePercentage(parts[12], &status.RxSNRPercentage); err != nil {
+		return nil, err
+	}
+	status.SerialNumber = parts[13]
+	if err := parseFloat64(parts[14], &status.RxPower); err != nil {
+		return nil, err
+	}
+	if err := parsePercentage(parts[15], &status.RxPowerPercentage); err != nil {
+		return nil, err
+	}
+	if err := parseFloat64(parts[16], &status.CableResistance); err != nil {
+		return nil, err
+	}
+	if err := parsePercentage(parts[17], &status.CableResistancePercentage); err != nil {
+		return nil, err
+	}
+	status.ODUTelemetryStatus = parts[18]
+	if err := parseFloat64(parts[19], &status.CableAttenuation); err != nil {
+		return nil, err
+	}
+	if err := parsePercentage(parts[20], &status.CableAttenuationPercentage); err != nil {
+		return nil, err
+	}
+	status.IFLType = parts[21]
+	status.PartNumber = parts[22]
+	status.StatusImageURI = parts[23]
+	status.SatelliteStatusURI = parts[24]
+	status.Unknown25 = parts[25]
+	status.StatusHTML = parts[26]
+	status.HealthHTML = parts[27]
+	status.Unknown28 = parts[28]
+	status.Unknown29 = parts[29]
+	status.LastPageLoadDuration = parts[30]
+	status.Unknown31 = parts[31]
+	status.Unknown32 = parts[32]
+	return &status, nil
 }
 
 // Parses an integer from the given string. Can handle leading/trailing spaces
 // as well as embedded commas.
 func parseInt64(str string, dest *int64) error {
-  str = strings.TrimSpace(str)
+	str = strings.TrimSpace(str)
 	if len(str) == 0 {
 		*dest = 0
-    return nil
+		return nil
 	}
 
 	str = strings.Replace(str, ",", "", -1) // Remove commas
-	if val, err := strconv.ParseInt(str, 10, 64); err != nil{
-    return err
-  } else {
-    *dest = val
-    return nil
-  }
+	if val, err := strconv.ParseInt(str, 10, 64); err != nil {
+		return err
+	} else {
+		*dest = val
+		return nil
+	}
 }
 
 // Parses a float from the given string. Can handle leading/trailing spaces as
 // well as embedded commas.
-func parseFloat64(str string, dest *float64) error{
-  str = strings.TrimSpace(str)
-  if len(str) == 0 {
-    *dest = 0
-    return nil
-  }
+func parseFloat64(str string, dest *float64) error {
+	str = strings.TrimSpace(str)
+	if len(str) == 0 {
+		*dest = 0
+		return nil
+	}
 
-  str = strings.Replace(str, ",", "", -1) // Remove commas
-  if val, err := strconv.ParseFloat(str, 64); err != nil{
-    return err
-  } else {
-    *dest = val
-    return nil
-  }
+	str = strings.Replace(str, ",", "", -1) // Remove commas
+	if val, err := strconv.ParseFloat(str, 64); err != nil {
+		return err
+	} else {
+		*dest = val
+		return nil
+	}
 }
 
 // Parses a float from the given string. This method works the same as
 // parseFloat64 except that it also trims percentage signs (%).
-func parsePercentage(str string, dest *float64) error{
-  str = strings.Replace(str, "%", "", -1)
-  return parseFloat64(str, dest)
+func parsePercentage(str string, dest *float64) error {
+	str = strings.Replace(str, "%", "", -1)
+	return parseFloat64(str, dest)
 }
 
 // ModemStatus provides information describing the state of the modem.
