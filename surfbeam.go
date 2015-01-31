@@ -61,11 +61,11 @@ func parseModemStatus(str string) (*ModemStatus, error) {
 	parts := strings.Split(str, "##")
 	var status ModemStatus
 	status.IPAddress = net.ParseIP(parts[0])
-	if mac, err := net.ParseMAC(parts[1]); err != nil {
+	mac, err := net.ParseMAC(parts[1])
+	if err != nil {
 		return nil, err
-	} else {
-		status.MACAddress = mac
 	}
+	status.MACAddress = mac
 	status.SoftwareVersion = parts[2]
 	status.HardwareVersion = parts[3]
 	status.Status = parts[4]
@@ -136,12 +136,13 @@ func parseInt64(str string, dest *int64) error {
 	}
 
 	str = strings.Replace(str, ",", "", -1) // Remove commas
-	if val, err := strconv.ParseInt(str, 10, 64); err != nil {
+	val, err := strconv.ParseInt(str, 10, 64)
+	if err != nil {
 		return err
-	} else {
-		*dest = val
-		return nil
 	}
+
+	*dest = val
+	return nil
 }
 
 // Parses a float from the given string. Can handle leading/trailing spaces as
@@ -154,12 +155,13 @@ func parseFloat64(str string, dest *float64) error {
 	}
 
 	str = strings.Replace(str, ",", "", -1) // Remove commas
-	if val, err := strconv.ParseFloat(str, 64); err != nil {
+	val, err := strconv.ParseFloat(str, 64)
+	if err != nil {
 		return err
-	} else {
-		*dest = val
-		return nil
 	}
+
+	*dest = val
+	return nil
 }
 
 // Parses a float from the given string. This method works the same as
