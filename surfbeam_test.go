@@ -3,12 +3,41 @@ package surfbeam
 import (
 	"bytes"
 	"net"
+	"net/http"
 	"testing"
 )
 
-var intTests = []struct {
+func TestNew(t *testing.T) {
+	c := New("http://192.168.100.1")
+	if c == nil {
+		t.Error("client was null")
+		t.FailNow()
+	}
+
+	expected := "http://192.168.100.1"
+	if c.modemURI != expected {
+		t.Errorf("Expected modemUri %v but was %v", expected, c.modemURI)
+	}
+
+	if c.client != http.DefaultClient {
+		t.Errorf("Expected http.DefaultClient but was something else")
+	}
+}
+
+var uint32Tests = []struct {
 	in  string
-	out int64
+	out uint32
+}{
+	{"", 0},
+	{" ", 0},
+	{"12", 12},
+	{"1,234,554", 1234554},
+	{"1,23,44", 12344},
+}
+
+var uint64Tests = []struct {
+	in  string
+	out uint64
 }{
 	{"", 0},
 	{" ", 0},
@@ -44,14 +73,27 @@ var percentageTests = []struct {
 	{"1,234,554.678  %", 1234554.678},
 }
 
-func TestParseInt64(t *testing.T) {
+func TestParseUint32(t *testing.T) {
 	var status ModemStatus
-	for _, tt := range intTests {
-		if err := parseInt64(tt.in, &status.TransmittedPackets); err != nil {
-			t.Errorf("parseInt64 %q: Error parsing: %v", tt.in, err)
+	for _, tt := range uint32Tests {
+		if err := parseUint32(tt.in, &status.LossOfSyncCount); err != nil {
+			t.Errorf("parseUint32 %q: Error parsing: %v", tt.in, err)
+		} else {
+			if status.LossOfSyncCount != tt.out {
+				t.Errorf("parseUint32 %q: Expected %d but was %d", tt.in, tt.out, status.TransmittedPackets)
+			}
+		}
+	}
+}
+
+func TestParseUint64(t *testing.T) {
+	var status ModemStatus
+	for _, tt := range uint64Tests {
+		if err := parseUint64(tt.in, &status.TransmittedPackets); err != nil {
+			t.Errorf("parseUint64 %q: Error parsing: %v", tt.in, err)
 		} else {
 			if status.TransmittedPackets != tt.out {
-				t.Errorf("parseInt64 %q: Expected %d but was %d", tt.in, tt.out, status.TransmittedPackets)
+				t.Errorf("parseUint64 %q: Expected %d but was %d", tt.in, tt.out, status.TransmittedPackets)
 			}
 		}
 	}
@@ -90,10 +132,10 @@ var modemStatusTests = []struct {
 	SoftwareVersion    string
 	HardwareVersion    string
 	Status             string
-	TransmittedPackets int64
-	TransmittedBytes   int64
-	ReceivedPackets    int64
-	ReceivedBytes      int64
+	TransmittedPackets uint64
+	TransmittedBytes   uint64
+	ReceivedPackets    uint64
+	ReceivedBytes      uint64
 }{
 	{
 		`55.55.55.55##55:55:55:55:55:55##UT_1.5.2.2.3##UT_7 P3_V1##Online##7,088,473##1,693,689,905##9,378,757##9,532,929,796##000:01:37:54##2##6.2##32%##012345678901##-44.3##47%##1.5##6%##Active##12.4##82%##Single##0123456789##images/Modem_Status_005_Online.png##/images/Satellite_Status_Purple.png##0##<p style=""color:green"">Connected</p>##<p style=""color:green"">Good</p>##0.00%##0.00%##6.67s##195##10000000##`,

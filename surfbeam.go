@@ -69,20 +69,20 @@ func parseModemStatus(str string) (*ModemStatus, error) {
 	status.SoftwareVersion = parts[2]
 	status.HardwareVersion = parts[3]
 	status.Status = parts[4]
-	if err := parseInt64(parts[5], &status.TransmittedPackets); err != nil {
+	if err := parseUint64(parts[5], &status.TransmittedPackets); err != nil {
 		return nil, err
 	}
-	if err := parseInt64(parts[6], &status.TransmittedBytes); err != nil {
+	if err := parseUint64(parts[6], &status.TransmittedBytes); err != nil {
 		return nil, err
 	}
-	if err := parseInt64(parts[7], &status.ReceivedPackets); err != nil {
+	if err := parseUint64(parts[7], &status.ReceivedPackets); err != nil {
 		return nil, err
 	}
-	if err := parseInt64(parts[8], &status.ReceivedBytes); err != nil {
+	if err := parseUint64(parts[8], &status.ReceivedBytes); err != nil {
 		return nil, err
 	}
 	status.OnlineTime = parts[9]
-	if err := parseInt64(parts[10], &status.LossOfSyncCount); err != nil {
+	if err := parseUint32(parts[10], &status.LossOfSyncCount); err != nil {
 		return nil, err
 	}
 	if err := parseFloat64(parts[11], &status.RxSNR); err != nil {
@@ -126,9 +126,29 @@ func parseModemStatus(str string) (*ModemStatus, error) {
 	return &status, nil
 }
 
-// Parses an integer from the given string. Can handle leading/trailing spaces
+// Parses an uint32 from the given string. Can handle leading/trailing spaces
 // as well as embedded commas.
-func parseInt64(str string, dest *int64) error {
+func parseUint32(str string, dest *uint32) error {
+	str = strings.TrimSpace(str)
+
+	if len(str) == 0 {
+		*dest = 0
+		return nil
+	}
+
+	str = strings.Replace(str, ",", "", -1) // Remove commas
+	val, err := strconv.ParseUint(str, 10, 32)
+	if err != nil {
+		return err
+	}
+
+	*dest = uint32(val)
+	return nil
+}
+
+// Parses an uint64 from the given string. Can handle leading/trailing spaces
+// as well as embedded commas.
+func parseUint64(str string, dest *uint64) error {
 	str = strings.TrimSpace(str)
 	if len(str) == 0 {
 		*dest = 0
@@ -136,7 +156,7 @@ func parseInt64(str string, dest *int64) error {
 	}
 
 	str = strings.Replace(str, ",", "", -1) // Remove commas
-	val, err := strconv.ParseInt(str, 10, 64)
+	val, err := strconv.ParseUint(str, 10, 64)
 	if err != nil {
 		return err
 	}
@@ -178,12 +198,12 @@ type ModemStatus struct {
 	SoftwareVersion            string
 	HardwareVersion            string
 	Status                     string
-	TransmittedPackets         int64
-	TransmittedBytes           int64
-	ReceivedPackets            int64
-	ReceivedBytes              int64
+	TransmittedPackets         uint64
+	TransmittedBytes           uint64
+	ReceivedPackets            uint64
+	ReceivedBytes              uint64
 	OnlineTime                 string // TODO: use time.Duration
-	LossOfSyncCount            int64
+	LossOfSyncCount            uint32
 	RxSNR                      float64
 	RxSNRPercentage            float64
 	SerialNumber               string
