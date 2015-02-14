@@ -1,4 +1,4 @@
-# go-surfbeam
+# go-surfbeam [![Build Status](https://travis-ci.org/blachniet/go-surfbeam.svg?branch=master)](https://travis-ci.org/blachniet/go-surfbeam)
 
 This package provides easy access modem status data provided by ViaSat's
 SurfBeam® 2 satellite modems' CGI api.
