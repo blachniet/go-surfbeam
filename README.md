@@ -1,4 +1,4 @@
-# go-surfbeam [![Build Status](https://travis-ci.org/blachniet/go-surfbeam.svg?branch=master)](https://travis-ci.org/blachniet/go-surfbeam) [![GoDoc](https://godoc.org/github.com/blachniet/go-surfbeam?status.svg)](https://godoc.org/github.com/blachniet/go-surfbeam) [![Rager Releases](http://rager.io/badge.svg)](http://rager.io/projects/search?badge=1&query=https://github.com/blachniet/go-surfbeam)
+# go-surfbeam [![Build Status](https://travis-ci.org/blachniet/go-surfbeam.svg?branch=master)](https://travis-ci.org/blachniet/go-surfbeam) [![GoDoc](https://godoc.org/github.com/blachniet/go-surfbeam?status.svg)](https://godoc.org/github.com/blachniet/go-surfbeam) [![Rager Releases](http://rager.io/projects/search?badge=1&query=github.com/blachniet/go-surfbeam)](http://rager.io/badge?url=https%3A%2F%2Fgithub.com%2Fblachniet%2Fgo-surfbeam)
 
 This package provides easy access modem status data provided by ViaSat's
 SurfBeam® 2 satellite modems' CGI api.
